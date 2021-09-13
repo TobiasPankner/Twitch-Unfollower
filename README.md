@@ -1,5 +1,5 @@
 # Twitch-Unfollower
-[![GitHub stars](https://img.shields.io/github/stars/TobiasPankner/Teams-Auto-Joiner.svg?style=social&label=Star)](https://GitHub.com/TobiasPankner/Twitch-Unfollower/stargazers/)
+[![GitHub stars](https://img.shields.io/github/stars/TobiasPankner/Twitch-Unfollower.svg?style=social&label=Star)](https://GitHub.com/TobiasPankner/Twitch-Unfollower/stargazers/)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3TU2XDBK2JFU4&source=url)
 
 - [Prerequisites](#prerequisites)
