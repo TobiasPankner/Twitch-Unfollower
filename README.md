@@ -8,6 +8,8 @@
 Python script to mass unfollow twitch channels.  
 Since websites that used to do the same don't work anymore, I created this simple Web Automation program to quickly unfollow alot of channels.
 
+![](readme_gif.gif)
+
 ## Prerequisites  
   
  - Python3 ([Download](https://www.python.org/downloads/))  
