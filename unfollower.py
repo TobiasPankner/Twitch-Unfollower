@@ -5,35 +5,27 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
+import undetected_chromedriver as uc
 
 driver: webdriver.Chrome = None
 
 
-def init_driver(headless=True):
+def init_driver():
     global driver
 
     options = Options()
 
     options.add_argument("--mute-audio")
 
-    if headless:
-        options.add_argument("--headless")
-
-        # disable image loading
-        chrome_prefs = {}
-        options.experimental_options["prefs"] = chrome_prefs
-        chrome_prefs["profile.default_content_settings"] = {"images": 2}
-        chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
-
-    options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option('useAutomationExtension', False)
     options.set_capability('unhandledPromptBehavior', 'dismiss')
 
-    # Page load strategy none doesnt wait for the page to fully load before continuing
+    # Page load strategy none doesn't wait for the page to fully load before continuing
     caps = DesiredCapabilities().CHROME
     caps["pageLoadStrategy"] = "none"
 
-    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options, desired_capabilities=caps)
+    driver = uc.Chrome(chrome_options=options, desired_capabilities=caps)
 
 
 def wait_until_found(sel, timeout, multiple=False, display=True):
@@ -45,8 +37,8 @@ def wait_until_found(sel, timeout, multiple=False, display=True):
             return None
 
         if multiple:
-            return driver.find_elements_by_css_selector(sel)
-        return driver.find_element_by_css_selector(sel)
+            return driver.find_elements(By.CSS_SELECTOR, sel)
+        return driver.find_element(By.CSS_SELECTOR, sel)
     except exceptions.TimeoutException:
         if display:
             print(f"Timeout waiting for element. ({sel})")
@@ -54,7 +46,7 @@ def wait_until_found(sel, timeout, multiple=False, display=True):
 
 
 def main():
-    init_driver(headless=False)
+    init_driver()
 
     driver.get("https://www.twitch.tv/directory/following/channels")
 
@@ -67,9 +59,9 @@ def main():
             break
         user_card = user_cards[0]
 
-        user_detail_card = user_card.find_element_by_css_selector("div>.user-card")
-        username = user_detail_card.find_element_by_css_selector(".info>a").get_attribute("aria-label")
-        unfollow_button = user_detail_card.find_element_by_css_selector("button[data-a-target='unfollow-button']")
+        user_detail_card = user_card.find_element(By.CSS_SELECTOR, "div>.user-card")
+        username = user_detail_card.find_element(By.CSS_SELECTOR, ".info>a").get_attribute("aria-label")
+        unfollow_button = user_detail_card.find_element(By.CSS_SELECTOR, "button[data-a-target='unfollow-button']")
 
         try:
             driver.execute_script("arguments[0].click();", unfollow_button)
