@@ -1,94 +1,74 @@
-from selenium import webdriver
-from selenium.common import exceptions
-from selenium.webdriver import DesiredCapabilities
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-import undetected_chromedriver as uc
-
-driver: webdriver.Chrome = None
-
-
-def init_driver():
-    global driver
-
-    options = Options()
-
-    options.add_argument("--mute-audio")
-
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option('useAutomationExtension', False)
-    options.set_capability('unhandledPromptBehavior', 'dismiss')
-
-    # Page load strategy none doesn't wait for the page to fully load before continuing
-    caps = DesiredCapabilities().CHROME
-    caps["pageLoadStrategy"] = "none"
-
-    driver = uc.Chrome(chrome_options=options, desired_capabilities=caps)
-
-
-def wait_until_found(sel, timeout, multiple=False, display=True):
-    try:
-        element_present = EC.visibility_of_element_located((By.CSS_SELECTOR, sel))
-        try:
-            WebDriverWait(driver, timeout).until(element_present)
-        except AttributeError:
-            return None
-
-        if multiple:
-            return driver.find_elements(By.CSS_SELECTOR, sel)
-        return driver.find_element(By.CSS_SELECTOR, sel)
-    except exceptions.TimeoutException:
-        if display:
-            print(f"Timeout waiting for element. ({sel})")
-        return None
+import requests
 
 
 def main():
-    init_driver()
+    necessary_headers = ['Authorization', 'Client-Id', 'Client-Integrity', 'X-Device-Id', 'Content-Type']
+    try:
+        with open('headers.txt', 'r') as file:
+            headers = dict(
+                [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file.read().split('\n')[1:] if
+                 len(h) > 1 and h.split(':', 1)[0] in necessary_headers])
+    except:
+        print("Failed to read headers.txt, have you created the file?")
+        exit(1)
 
-    driver.get("https://www.twitch.tv/directory/following/channels")
+    done = False
+    while not done:
+        get_channels_payload = [
+            {
+                "operationName": "ChannelFollows",
+                "variables": {
+                    "limit": 100,
+                    "order": "DESC"
+                },
+                "extensions": {
+                    "persistedQuery": {
+                        "version": 1,
+                        "sha256Hash": "eecf815273d3d949e5cf0085cc5084cd8a1b5b7b6f7990cf43cb0beadf546907"
+                    }
+                }
+            }
+        ]
+        channels_resp = requests.post('https://gql.twitch.tv/gql', headers=headers, json=get_channels_payload)
+        if channels_resp.status_code != 200:
+            print("Error getting followed channels")
+            exit(1)
 
-    input("Press Enter when logged in")
-
-    cnt = 0
-    while 1:
-        user_cards = wait_until_found(".channel-follow-listing--card", 30, multiple=True)
-        if user_cards is None or len(user_cards) == 0:
-            break
-        user_card = user_cards[0]
-
-        user_detail_card = user_card.find_element(By.CSS_SELECTOR, "div>.user-card")
-        username = user_detail_card.find_element(By.CSS_SELECTOR, ".info>a").get_attribute("aria-label")
-        unfollow_button = user_detail_card.find_element(By.CSS_SELECTOR, "button[data-a-target='unfollow-button']")
-
-        try:
-            driver.execute_script("arguments[0].click();", unfollow_button)
-        except exceptions.JavascriptException:
+        channels_json_resp = channels_resp.json()
+        channel_ids = set([c['node']['id'] for c in channels_json_resp[0]['data']['user']['follows']['edges']])
+        if len(channel_ids) == 0:
+            done = True
             continue
 
-        confirm_unfollow_button = wait_until_found("button[data-a-target='modal-unfollow-button']", 3)
-        if confirm_unfollow_button is None:
-            continue
+        for channel_id in channel_ids:
+            unfollow_payload = [
+                {
+                    "operationName": "FollowButton_UnfollowUser",
+                    "variables": {
+                        "input": {
+                            "targetID": channel_id
+                        }
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "f7dae976ebf41c755ae2d758546bfd176b4eeb856656098bb40e0a672ca0d880"
+                        }
+                    }
+                }
+            ]
 
-        confirm_unfollow_button.click()
+            resp = requests.post('https://gql.twitch.tv/gql', headers=headers, json=unfollow_payload)
+            if resp.status_code != 200:
+                print(f"Error unfollowing: {channel_id}")
+                return None
 
-        print(f"Unfollowed: {username}")
+            json_resp = resp.json()
 
-        try:
-            driver.execute_script("arguments[0].remove();", user_card)
-        except exceptions.JavascriptException:
-            continue
-
-        if cnt % 5 == 0:
-            try:
-                driver.execute_script("arguments[0].scrollIntoView();", user_cards[-1])
-            except exceptions.JavascriptException:
-                continue
-
-        cnt += 1
-    pass
+            if json_resp[0]['data']['unfollowUser']['follow'] is None:
+                print(f"Already unfollowed: {channel_id}")
+            else:
+                print(f"Unfollowed: {json_resp[0]['data']['unfollowUser']['follow']['user']['displayName']}")
 
 
 if __name__ == '__main__':
