@@ -4,9 +4,13 @@ import requests
 def main():
     necessary_headers = ['Authorization', 'Client-Id', 'Client-Integrity', 'X-Device-Id', 'Content-Type']
     try:
-        with open('headers.txt', 'r') as file:
+        with open('headers.txt', 'r', encoding='utf-8') as file:
+            file_content = file.read().splitlines()[1:]
+
+            print("\n".join(file_content))
+
             headers = dict(
-                [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file.read().splitlines()[1:] if
+                [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file_content if
                  len(h) > 1 and h.split(':', 1)[0].strip() in necessary_headers])
     except:
         print("Failed to read headers.txt, have you created the file?")
