@@ -6,13 +6,14 @@ def main():
     try:
         with open('headers.txt', 'r') as file:
             headers = dict(
-                [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file.read().split('\n')[1:] if
-                 len(h) > 1 and h.split(':', 1)[0] in necessary_headers])
+                [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file.read().splitlines()[1:] if
+                 len(h) > 1 and h.split(':', 1)[0].strip() in necessary_headers])
     except:
         print("Failed to read headers.txt, have you created the file?")
         exit(1)
 
     if not len(headers) == len(necessary_headers):
+        print(headers.keys())
         print("Missing headers in headers.txt")
         exit(1)
 
