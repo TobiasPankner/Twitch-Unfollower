@@ -12,6 +12,10 @@ def main():
         print("Failed to read headers.txt, have you created the file?")
         exit(1)
 
+    if not len(headers) == len(necessary_headers):
+        print("Missing headers in headers.txt")
+        exit(1)
+
     done = False
     while not done:
         get_channels_payload = [
@@ -32,6 +36,8 @@ def main():
         channels_resp = requests.post('https://gql.twitch.tv/gql', headers=headers, json=get_channels_payload)
         if channels_resp.status_code != 200:
             print("Error getting followed channels")
+            print(channels_resp.status_code)
+            print(channels_resp.text)
             exit(1)
 
         channels_json_resp = channels_resp.json()
@@ -61,7 +67,9 @@ def main():
             resp = requests.post('https://gql.twitch.tv/gql', headers=headers, json=unfollow_payload)
             if resp.status_code != 200:
                 print(f"Error unfollowing: {channel_id}")
-                return None
+                print(resp.status_code)
+                print(resp.text)
+                exit(1)
 
             json_resp = resp.json()
 
