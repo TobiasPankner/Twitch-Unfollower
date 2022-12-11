@@ -7,8 +7,6 @@ def main():
         with open('headers.txt', 'r', encoding='utf-8') as file:
             file_content = file.read().splitlines()[1:]
 
-            print("\n\n".join(file_content))
-
             headers = dict(
                 [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file_content if
                  len(h) > 1 and h.split(':', 1)[0].strip() in necessary_headers])
@@ -17,7 +15,7 @@ def main():
         exit(1)
 
     if not len(headers) == len(necessary_headers):
-        print(headers.keys())
+        print(f"Found headers: {list(headers.keys())}")
         print("Missing headers in headers.txt")
         exit(1)
 
