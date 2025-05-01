@@ -18,15 +18,18 @@ Since websites that used to do the same don't work anymore, I created this simpl
 **Treat these headers like your password!**
 
 1. Log into your Twitch account
-2. Open Chrome dev tools (F12) -> Network
-3. Refresh the page
-4. Copy the cookie of one of the gql requests (Right click -> Copy -> Copy request headers)
+2. Open Chrome dev tools (F12) -> Network tab
+3. Refresh the page (F5)
+4. Find a request to `https://gql.twitch.tv/gql` in the list.
+5. Right-click on the request -> Copy -> Copy as cURL (cmd)
 
 ![image](https://user-images.githubusercontent.com/39444749/206862007-63c4c0ed-dbfa-4e71-8f34-2d42f75dd63a.png)
+*(Note: The image shows copying 'request headers', but you should copy as 'cURL (cmd)' instead)*
 
 ## Run the script
 
  1. Install dependencies:   ```pip install -r requirements.txt```
- 2.  [Get your twitch authorization](#getting-your-twitch-authorization)
- 3. Create a file called "headers.txt" and paste the headers in there
- 4. Run [unfollower.py](unfollower.py): `python unfollower.py`
+ 2.  [Get your twitch authorization](#getting-your-twitch-authorization) by copying the request as cURL (cmd).
+ 3. Create a file called "headers.txt" in the same directory as the script.
+ 4. Paste the copied cURL command into `headers.txt`.
+ 5. Run [unfollower.py](unfollower.py): `python unfollower.py`
