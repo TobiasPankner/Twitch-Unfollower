@@ -23,8 +23,8 @@ Since websites that used to do the same don't work anymore, I created this simpl
 4. Find a request to `https://gql.twitch.tv/gql` in the list.
 5. Right-click on the request -> Copy -> Copy as cURL (cmd)
 
-![image](demoo.png)
-*(Note: The image shows copying 'request headers', but you should copy as 'cURL (cmd)' instead)*
+![demo](https://github.com/user-attachments/assets/5d2942bd-2358-4b78-ba9d-71929e808a09)
+
 
 ## Run the script
 
