@@ -1,0 +1,25 @@
+curl 'https://gql.twitch.tv/gql' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB' \
+  -H 'authorization: OAuth osqdkizj5sb57oy6vitqg6epi85o27' \
+  -H 'cache-control: no-cache' \
+  -H 'client-id: kimne78kx3ncx6brgo4mv6wki5h1ko' \
+  -H 'client-integrity: v4.local.PW4FEqPydaN8-e6EhybWbUuVOaW3VEOHoNYP5GIRsY1AoNPjJXDY_71FWrJZHXu4sHT53_eQdJv1ft_UuiroOW3U_F1NlWXq9kpG_WH0Qk9KTv2uWuOjcKqWPsqHj8wXc0ufYxQkF_PrDG-PJm99budTdBlNZ4eUAQ0cUE6yKPktFCSNmmpaLppUplxPSTLLWfvZeQ9ILOUNIXCVUMq1rsnFhdSbmT6GoqM2yXv0nA9Itlr4DPYm3hQWhvmV4oUXk0l3pxHWsuA9cCSmEK1BrA3tM1b1d7-reebcC6biGRARl9QXWLYw6DKTl7C7RSdUAErcf8hyq5CKGGwhdmy4GVt2COoPXcDJtoh-7S5hM_ZOkOMwzRqecNErM1D27IMwA7LIqowJD8B8PgJJ4KmsaGAYR_9qfNM9pb-14v8MXyHqyeBTR3wEnCU1h0F_DF-FZ6R-c6J8lNzNGIeO' \
+  -H 'client-session-id: 9061e308948fb3dd' \
+  -H 'client-version: cb2f16f4-ceae-4764-aa5e-5c3f7856ce78' \
+  -H 'content-type: text/plain;charset=UTF-8' \
+  -H 'dnt: 1' \
+  -H 'origin: https://www.twitch.tv' \
+  -H 'pragma: no-cache' \
+  -H 'priority: u=1, i' \
+  -H 'referer: https://www.twitch.tv/' \
+  -H 'sec-ch-ua: "Chromium";v="136", "Brave";v="136", "Not.A/Brand";v="99"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36' \
+  -H 'x-device-id: K4aCAJOWQl8W6JL0Dx0vmayXIvlABOzU' \
+  --data-raw '[{"operationName":"CanCreateClip","variables":{"broadcasterID":"44119758","vodID":null},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"ea1796b7893cd9ab447c989967e8441ea230ea54091f63e71d4b189b72d17215"}}}]'

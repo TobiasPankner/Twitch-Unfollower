@@ -13,10 +13,10 @@ def main():
     necessary_headers_lower = {h.lower(): h for h in necessary_headers}
     headers = {}
     try:
-        with open("headers.txt", "r", encoding="utf-8") as file:
+        with open("curl.txt", "r", encoding="utf-8") as file:
             file_content = file.read()
 
-            found_headers = re.findall(r"-H\s+\^\"([^:]+):\s*([^^]+)\^\"", file_content)
+            found_headers = re.findall(r"-H\s+\'([^:]+):\s*([^\']+)\'", file_content)
 
             for key, value in found_headers:
                 key_lower = key.strip().lower()
@@ -29,20 +29,20 @@ def main():
 
     except FileNotFoundError:
         print(
-            "Error: headers.txt not found. Please create it and paste the curl command inside."
+            "Error: curl.txt not found. Please create it and paste the curl command inside."
         )
         exit(1)
     except Exception as e:
-        print("Failed to read or parse headers.txt.")
+        print("Failed to read or parse curl.txt.")
         print(f"Error: {e}")
         exit(1)
 
     missing_headers = [h for h in necessary_headers if h not in headers]
     if missing_headers:
         print(f"Found headers: {list(headers.keys())}")
-        print(f"Missing required headers in headers.txt: {missing_headers}")
+        print(f"Missing required headers in curl.txt: {missing_headers}")
         print(
-            'Please ensure the curl command in headers.txt includes lines like -H ^"Header-Name: Value^" for all required headers.'
+            "Please ensure the curl command in curl.txt includes lines like -H 'Header-Name: Value' for all required headers."
         )
         exit(1)
 
