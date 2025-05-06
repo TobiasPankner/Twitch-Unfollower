@@ -30,6 +30,6 @@ Since websites that used to do the same don't work anymore, I created this simpl
 
  1. Install dependencies:   ```pip install -r requirements.txt```
  2.  [Get your twitch authorization](#getting-your-twitch-authorization) by copying the request as cURL (cmd).
- 3. Create a file called "headers.txt" in the same directory as the script.
- 4. Paste the copied cURL command into `headers.txt`.
+ 3. Create a file called "curl.txt" in the same directory as the script.
+ 4. Paste the copied cURL command into `curl.txt`.
  5. Run [unfollower.py](unfollower.py): `python unfollower.py`
