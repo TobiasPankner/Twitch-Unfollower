@@ -201,4 +201,5 @@ config.json
 venv
 .idea/
 debug.log
-headers.txt
+curl.txt
+# to not leak
