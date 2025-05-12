@@ -83,8 +83,6 @@ def main():
             print("Response JSON:", channels_json_resp)
             exit(1)
 
-        if len(channel_ids) == 0:
-            print("No more channels to unfollow.")
             done = True
             continue
 
@@ -111,7 +109,6 @@ def main():
                 print(f"Error unfollowing: {channel_id}")
                 print(resp.status_code)
                 print(resp.text)
-                continue
 
             try:
                 json_resp = resp.json()
@@ -127,8 +124,6 @@ def main():
                 print(f"Error: {e}")
                 print("Response JSON:", resp.text)
                 continue
-
-    print("Unfollowing process completed.")
 
 
 if __name__ == "__main__":
