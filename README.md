@@ -24,7 +24,8 @@ Since websites that used to do the same don't work anymore, I created this simpl
 4. Find a request to `https://gql.twitch.tv/gql` in the list.
 5. Right-click on the request -> Copy -> Copy as cURL (bash)
 
-![demo](https://github.com/user-attachments/assets/5d2942bd-2358-4b78-ba9d-71929e808a09)
+![demo](https://github.com/user-attachments/assets/54c8adbd-d1cf-4d19-8402-7802a6323d23)
+
 
 ## Run the script
 
