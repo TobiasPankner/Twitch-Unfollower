@@ -81,12 +81,16 @@ def main():
             print("Error parsing followed channels response.")
             print(f"Error: {e}")
             print("Response JSON:", channels_json_resp)
-            exit(1)
-
+            # It's unlikely this part will be reached if the API returns an empty list for edges
+            # but keeping it for robustness in case of other parsing errors.
             done = True
             continue
 
         print(f"Found {len(channel_ids)} channels in this batch.")
+
+        if not channel_ids:  # If no channels are found, we are done.
+            done = True
+            continue
 
         for channel_id in channel_ids:
             unfollow_payload = [
