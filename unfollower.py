@@ -1,22 +1,49 @@
 import requests
+import re
 
 
 def main():
-    necessary_headers = ['Authorization', 'Client-Id', 'Client-Integrity', 'X-Device-Id', 'Content-Type']
+    necessary_headers = [
+        "Authorization",
+        "Client-Id",
+        "Client-Integrity",
+        "X-Device-Id",
+        "Content-Type",
+    ]
+    necessary_headers_lower = {h.lower(): h for h in necessary_headers}
+    headers = {}
     try:
-        with open('headers.txt', 'r', encoding='utf-8') as file:
-            file_content = file.read().splitlines()[1:]
+        with open("curl.txt", "r", encoding="utf-8") as file:
+            file_content = file.read()
 
-            headers = dict(
-                [(h.split(':', 1)[0], h.split(':', 1)[1].strip()) for h in file_content if
-                 len(h) > 1 and h.split(':', 1)[0].strip() in necessary_headers])
-    except:
-        print("Failed to read headers.txt, have you created the file?")
+            found_headers = re.findall(r"-H\s+\'([^:]+):\s*([^\']+)\'", file_content)
+
+            for key, value in found_headers:
+                key_lower = key.strip().lower()
+                value = value.strip()
+
+                if key_lower in necessary_headers_lower:
+                    correct_case_key = necessary_headers_lower[key_lower]
+
+                    headers[correct_case_key] = value
+
+    except FileNotFoundError:
+        print(
+            "Error: curl.txt not found. Please create it and paste the curl command inside."
+        )
+        exit(1)
+    except Exception as e:
+        print("Failed to read or parse curl.txt.")
+        print(f"Error: {e}")
         exit(1)
 
-    if not len(headers) == len(necessary_headers):
+    missing_headers = [h for h in necessary_headers if h not in headers]
+    if missing_headers:
         print(f"Found headers: {list(headers.keys())}")
-        print("Missing headers in headers.txt")
+        print(f"Missing required headers in curl.txt: {missing_headers}")
+        print(
+            "Please ensure the curl command in curl.txt includes lines like -H 'Header-Name: Value' for all required headers."
+        )
         exit(1)
 
     done = False
@@ -24,19 +51,18 @@ def main():
         get_channels_payload = [
             {
                 "operationName": "ChannelFollows",
-                "variables": {
-                    "limit": 100,
-                    "order": "DESC"
-                },
+                "variables": {"limit": 100, "order": "DESC"},
                 "extensions": {
                     "persistedQuery": {
                         "version": 1,
-                        "sha256Hash": "eecf815273d3d949e5cf0085cc5084cd8a1b5b7b6f7990cf43cb0beadf546907"
+                        "sha256Hash": "eecf815273d3d949e5cf0085cc5084cd8a1b5b7b6f7990cf43cb0beadf546907",
                     }
-                }
+                },
             }
         ]
-        channels_resp = requests.post('https://gql.twitch.tv/gql', headers=headers, json=get_channels_payload)
+        channels_resp = requests.post(
+            "https://gql.twitch.tv/gql", headers=headers, json=get_channels_payload
+        )
         if channels_resp.status_code != 200:
             print("Error getting followed channels")
             print(channels_resp.status_code)
@@ -44,8 +70,25 @@ def main():
             exit(1)
 
         channels_json_resp = channels_resp.json()
-        channel_ids = set([c['node']['id'] for c in channels_json_resp[0]['data']['user']['follows']['edges']])
-        if len(channel_ids) == 0:
+        try:
+            channel_ids = set(
+                [
+                    c["node"]["id"]
+                    for c in channels_json_resp[0]["data"]["user"]["follows"]["edges"]
+                ]
+            )
+        except (IndexError, KeyError, TypeError) as e:
+            print("Error parsing followed channels response.")
+            print(f"Error: {e}")
+            print("Response JSON:", channels_json_resp)
+            # It's unlikely this part will be reached if the API returns an empty list for edges
+            # but keeping it for robustness in case of other parsing errors.
+            done = True
+            continue
+
+        print(f"Found {len(channel_ids)} channels in this batch.")
+
+        if not channel_ids:  # If no channels are found, we are done.
             done = True
             continue
 
@@ -53,34 +96,39 @@ def main():
             unfollow_payload = [
                 {
                     "operationName": "FollowButton_UnfollowUser",
-                    "variables": {
-                        "input": {
-                            "targetID": channel_id
-                        }
-                    },
+                    "variables": {"input": {"targetID": channel_id}},
                     "extensions": {
                         "persistedQuery": {
                             "version": 1,
-                            "sha256Hash": "f7dae976ebf41c755ae2d758546bfd176b4eeb856656098bb40e0a672ca0d880"
+                            "sha256Hash": "f7dae976ebf41c755ae2d758546bfd176b4eeb856656098bb40e0a672ca0d880",
                         }
-                    }
+                    },
                 }
             ]
 
-            resp = requests.post('https://gql.twitch.tv/gql', headers=headers, json=unfollow_payload)
+            resp = requests.post(
+                "https://gql.twitch.tv/gql", headers=headers, json=unfollow_payload
+            )
             if resp.status_code != 200:
                 print(f"Error unfollowing: {channel_id}")
                 print(resp.status_code)
                 print(resp.text)
-                exit(1)
 
-            json_resp = resp.json()
+            try:
+                json_resp = resp.json()
+                if json_resp[0]["data"]["unfollowUser"]["follow"] is None:
+                    print(f"Already unfollowed or error: {channel_id}")
+                else:
+                    display_name = json_resp[0]["data"]["unfollowUser"]["follow"][
+                        "user"
+                    ]["displayName"]
+                    print(f"Unfollowed: {display_name} (ID: {channel_id})")
+            except (IndexError, KeyError, TypeError) as e:
+                print(f"Error parsing unfollow response for channel {channel_id}.")
+                print(f"Error: {e}")
+                print("Response JSON:", resp.text)
+                continue
 
-            if json_resp[0]['data']['unfollowUser']['follow'] is None:
-                print(f"Already unfollowed: {channel_id}")
-            else:
-                print(f"Unfollowed: {json_resp[0]['data']['unfollowUser']['follow']['user']['displayName']}")
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
